@@ -1,4 +1,4 @@
-require File.expand_path('../lib/active_admin/axlsx/version', __FILE__)
+require_relative File.expand_path('../lib/active_admin/axlsx/version', __FILE__)
 Gem::Specification.new do |s|
   s.name        = 'activeadmin-axlsx'
   s.version     = ActiveAdmin::Axlsx::VERSION
