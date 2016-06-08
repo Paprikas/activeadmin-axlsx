@@ -7,22 +7,26 @@ module ActiveAdmin
         base.send :respond_to, :xlsx
       end
 
-      # patching the index method to allow the xlsx format.
-      def index_with_xlsx(options={}, &block)
-        index_without_xlsx(options) do |format|
-           format.xlsx do
-            xlsx = active_admin_config.xlsx_builder.serialize(collection)
-            send_data xlsx, :filename => "#{xlsx_filename}", :type => Mime::Type.lookup_by_extension(:xlsx)
+      def index_with_xlsx(&block)
+        index_without_xlsx do |format|
+          block.call format if block_given?
+
+          format.xlsx do
+            xlsx = active_admin_config.xlsx_builder.serialize(collection, view_context)
+            send_data(xlsx,
+                      :filename => "#{xlsx_filename}",
+                      :type => Mime::Type.lookup_by_extension(:xlsx))
           end
         end
       end
 
       # patching per_page to use the CSV record max for pagination when the format is xlsx
       def per_page_with_xlsx
-          if request.format ==  Mime::Type.lookup_by_extension(:xlsx)
-            return max_csv_records
-          end
-          per_page_without_xlsx
+        if request.format ==  Mime::Type.lookup_by_extension(:xlsx)
+          return max_per_page
+        end
+
+        per_page_without_xlsx
       end
 
       # Returns a filename for the xlsx file using the collection_name
